@@ -10,17 +10,19 @@
   "author": "Fachrul Lingga Pramadia",
   "license": "MIT",
   "devDependencies": {
-    "nodemon": "latest",
     "eslint": "latest",
     "eslint-config-airbnb-base": "latest",
     "eslint-config-prettier": "latest",
     "eslint-plugin-import": "latest",
     "eslint-plugin-prettier": "latest",
+    "nodemon": "latest",
     "prettier": "latest"
   },
   "dependencies": {
-    "express": "latest",
+    "compression": "^1.8.1",
     "cors": "latest",
-    "dotenv": "latest"
+    "dotenv": "latest",
+    "express": "latest",
+    "pg": "^8.16.3"
   }
 }
