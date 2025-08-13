@@ -4,7 +4,7 @@ exports.createTodo = async (req, res) => {
     const {text} = req.body
     const result = await pool.query('INSERT INTO todos (text) VALUES ($1) RETURNING *', [text])
 
-    res.json({
+    res.status(201).json({
         message: "berhasil tambah data",
         data: result.rows[0]
     })
