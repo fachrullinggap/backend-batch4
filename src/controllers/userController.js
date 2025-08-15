@@ -1,6 +1,10 @@
+const env = require('dotenv');
 const {PrismaClient} = require("../../generated/prisma")
 const pool = require('../config/db')
 const bcrypt = require("bcrypt")
+const validator = require('validator')
+const jwt = require('jsonwebtoken')
+
 
 const prisma = new PrismaClient()
 
@@ -20,6 +24,13 @@ exports.createUser = async (req, res, next) => {
 
         if (!username || !password || !email || !role) {
             const err = new Error("Username, password, email dan role harus di isi")
+            err.status = 400;
+            throw err;
+        }
+
+        const strongPass = validator.isStrongPassword(password)
+        if (!strongPass) {
+          const err = new Error("Password harus minimal 8 karakter (termasuk huruf besar, huruf kecil, angka, dan simbol")
             err.status = 400;
             throw err;
         }
@@ -131,6 +142,7 @@ exports.login = async (req, res, next) => {
       throw err;
     }
 
+    const token = jwt.sign({id: result.id.toString(), username: result.username, role: result.role.name}, process.env.JWT_SECRET, {expiresIn: "1h"})
 
     return res.status(200).json({
       message: 'User Berhasil Login',
@@ -138,7 +150,8 @@ exports.login = async (req, res, next) => {
         username: result.username,
         id: result.id.toString(),
         role_id: result.roleId.toString(),
-        role: result.role.name
+        role: result.role.name,
+        token: token
       },
     });
   } catch (error) {
@@ -148,7 +161,8 @@ exports.login = async (req, res, next) => {
 
 exports.updateUser = async (req, res, next) => {
   try {
-    const {id} = req.params
+    const {id} = req.user
+    // console.log(req.user)
     const {username} = req.body
 
     if (!username || !id) {
@@ -190,11 +204,11 @@ exports.updateUser = async (req, res, next) => {
 
 exports.deleteUser = async (req, res, next) => {
   try {
-    const {id} = req.params
+    const {role, id} = req.user
 
-    if (!id) {
-      const err = new Error('id harus diisi.');
-      err.status = 400;
+    if (role !== "admin") {
+      const err = new Error('Hanya admin yang boleh menghapus user.');
+      err.status = 404;
       throw err;
     }
 
