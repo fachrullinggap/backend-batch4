@@ -8,14 +8,46 @@ const jwt = require('jsonwebtoken')
 
 const prisma = new PrismaClient()
 
-exports.getUser = (req, res, next) => {
-    const user1 = {
-        nama: "Fachrul",
-        asal: "Bandung",
-        pekerjaan: "Software Developer"
-    }
+exports.getUsers = async (req, res, next) => {
+  try {
+    // 1. Fetch all users from the database using Prisma
+    const users = await prisma.user.findMany({
+      // Use 'select' to specify exactly which fields to return
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        // Include the related 'role' and select only its 'name' field
+        role: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        id: 'asc', // Optional: order the results by user ID
+      },
+    });
 
-    res.send(user1);
+    // 2. Map the results to flatten the data structure
+    // The query above returns role as an object: { role: { name: 'Admin' } }
+    // We need to transform it to: { role: 'Admin' }
+    const formattedUsers = users.map(user => ({
+      id: user.id.toString(),
+      username: user.username,
+      email: user.email,
+      role: user.role.name, // Flatten the nested role name
+    }));
+
+    // 3. Send the formatted data as the response
+    return res.status(200).json({
+      message: 'Successfully retrieved all users',
+      data: formattedUsers,
+    });
+  } catch (error) {
+    // Pass any errors to the next middleware
+    next(error);
+  }
 };
 
 exports.createUser = async (req, res, next) => {
@@ -149,6 +181,7 @@ exports.login = async (req, res, next) => {
       data: {
         username: result.username,
         id: result.id.toString(),
+        email: result.email,
         role_id: result.roleId.toString(),
         role: result.role.name,
         token: token

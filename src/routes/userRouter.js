@@ -4,7 +4,7 @@ const {verify} = require('../middlewares/verifyToken')
 
 const router = express.Router();
 
-router.get('/', userController.getUser)
+router.get('/get-users',verify, userController.getUsers)
 router.post('/create', userController.createUser)
 router.post('/create-role',verify , userController.createRole)
 router.post('/login', userController.login)
