@@ -1,5 +1,6 @@
 const env = require('dotenv');
 const {PrismaClient} = require("../../generated/prisma")
+// const {PrismaClient} = require("@prisma/client")
 const pool = require('../config/db')
 const bcrypt = require("bcrypt")
 const validator = require('validator')
