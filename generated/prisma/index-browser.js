@@ -130,27 +130,45 @@ exports.Prisma.UserScalarFieldEnum = {
   username: 'username',
   password: 'password',
   email: 'email',
+  profilePictureUrl: 'profilePictureUrl',
   roleId: 'roleId'
+};
+
+exports.Prisma.CustomerScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  phone: 'phone',
+  email: 'email'
 };
 
 exports.Prisma.ProductScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  description: 'description',
+  detail: 'detail',
   price: 'price',
-  stock: 'stock'
+  image: 'image',
+  category: 'category'
 };
 
-exports.Prisma.TransactionScalarFieldEnum = {
+exports.Prisma.OrderScalarFieldEnum = {
   id: 'id',
+  orderNumber: 'orderNumber',
+  customerId: 'customerId',
   userId: 'userId',
-  transactionDate: 'transactionDate',
-  totalAmount: 'totalAmount'
+  orderDate: 'orderDate',
+  orderType: 'orderType',
+  orderDetails: 'orderDetails',
+  status: 'status',
+  subTotal: 'subTotal',
+  tax: 'tax',
+  total: 'total',
+  amountReceived: 'amountReceived',
+  amountChange: 'amountChange'
 };
 
-exports.Prisma.TransactionItemScalarFieldEnum = {
+exports.Prisma.OrderItemScalarFieldEnum = {
   id: 'id',
-  transactionId: 'transactionId',
+  orderId: 'orderId',
   productId: 'productId',
   quantity: 'quantity',
   price: 'price'
@@ -170,14 +188,25 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.OrderType = exports.$Enums.OrderType = {
+  DINE_IN: 'DINE_IN',
+  TAKE_AWAY: 'TAKE_AWAY',
+  DELIVERY: 'DELIVERY'
+};
 
+exports.OrderStatus = exports.$Enums.OrderStatus = {
+  PENDING: 'PENDING',
+  PAID: 'PAID',
+  CANCELLED: 'CANCELLED'
+};
 
 exports.Prisma.ModelName = {
   Role: 'Role',
   User: 'User',
+  Customer: 'Customer',
   Product: 'Product',
-  Transaction: 'Transaction',
-  TransactionItem: 'TransactionItem'
+  Order: 'Order',
+  OrderItem: 'OrderItem'
 };
 
 /**

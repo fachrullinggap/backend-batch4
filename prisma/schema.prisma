@@ -15,46 +15,89 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum OrderType {
+  DINE_IN
+  TAKE_AWAY
+  DELIVERY
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
 model Role {
-  id   BigInt @id @default(autoincrement())
-  name String @unique
+  id    BigInt @id @default(autoincrement())
+  name  String @unique
   users User[]
 }
 
 model User {
-  id       BigInt @id @default(autoincrement())
-  username String @unique
-  password String
-  email    String @unique
-  role     Role?  @relation(fields: [roleId], references: [id])
-  roleId   BigInt?
-  transactions Transaction[]
+  id                BigInt  @id @default(autoincrement())
+  username          String  @unique
+  password          String
+  email             String  @unique
+  profilePictureUrl String?
+  role              Role?   @relation(fields: [roleId], references: [id])
+  roleId            BigInt?
+  orders            Order[]
+}
+
+// New model specifically for customer information
+model Customer {
+  id     BigInt  @id @default(autoincrement())
+  name   String
+  phone  String? @unique
+  email  String? @unique
+  // A customer can have multiple orders
+  orders Order[]
 }
 
 model Product {
-  id          BigInt @id @default(autoincrement())
-  name        String
-  description String?
-  price       Decimal
-  stock       Int
-  transactionItems TransactionItem[]
+  id         BigInt      @id @default(autoincrement())
+  name       String
+  detail     String?
+  price      Decimal
+  image      String?
+  category   String?
+  // A product can be in many order items
+  orderItems OrderItem[]
 }
 
-model Transaction {
-  id              BigInt @id @default(autoincrement())
-  user            User?  @relation(fields: [userId], references: [id])
-  userId          BigInt?
-  transactionDate DateTime @default(now())
-  totalAmount     Decimal
-  items           TransactionItem[]
+// Renamed from Transaction to Order and added more fields
+model Order {
+  id          String   @id @default(cuid()) // Using CUID for unique, random string IDs like 'ORD-...'
+  orderNumber String   @unique // For the human-readable order number like 'ORD-6089-37'
+  customer    Customer @relation(fields: [customerId], references: [id])
+  customerId  BigInt
+  // The employee/user who processed the order
+  user        User     @relation(fields: [userId], references: [id])
+  userId      BigInt
+
+  orderDate    DateTime    @default(now())
+  orderType    OrderType // Using the Enum for Dine In, etc.
+  orderDetails String? // For extra details like 'Table 5'
+  status       OrderStatus @default(PAID)
+
+  subTotal       Decimal
+  tax            Decimal @default(0)
+  total          Decimal // This was totalAmount
+  amountReceived Decimal
+  amountChange   Decimal
+
+  // Renamed from 'items'
+  orderItems OrderItem[]
 }
 
-model TransactionItem {
-  id            BigInt @id @default(autoincrement())
-  transaction   Transaction @relation(fields: [transactionId], references: [id])
-  transactionId BigInt
-  product       Product @relation(fields: [productId], references: [id])
-  productId     BigInt
-  quantity      Int
-  price         Decimal
+// Renamed from TransactionItem to OrderItem
+model OrderItem {
+  id        BigInt  @id @default(autoincrement())
+  order     Order   @relation(fields: [orderId], references: [id])
+  orderId   String
+  product   Product @relation(fields: [productId], references: [id])
+  productId BigInt
+  quantity  Int
+  // Price of the product at the time of the transaction
+  price     Decimal
 }

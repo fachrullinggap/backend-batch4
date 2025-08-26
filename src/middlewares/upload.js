@@ -1,11 +1,9 @@
-const express = require('express')
-const multer = require('multer')
+const multer = require('multer');
+
+// Use memory storage to handle the file as a buffer
 const storage = multer.memoryStorage();
-const uploadController = require('../controllers/uploadController')
 
-const router = express.Router()
 // Configure multer
-
 const upload = multer({
   storage: storage,
   limits: {
@@ -21,6 +19,4 @@ const upload = multer({
   },
 });
 
-router.post('/', upload.single('gambar'), uploadController.uploadFile)
-
-module.exports = router
+module.exports = upload;
