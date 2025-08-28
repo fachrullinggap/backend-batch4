@@ -95,7 +95,7 @@ model OrderItem {
   id        BigInt  @id @default(autoincrement())
   order     Order   @relation(fields: [orderId], references: [id])
   orderId   String
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId BigInt
   quantity  Int
   // Price of the product at the time of the transaction
